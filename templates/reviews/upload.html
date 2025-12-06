@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>Загрузка файла</title></head>
+<body>
+  <h1>Загрузка файла с отзывами</h1>
+  {% if messages %}{% for m in messages %}<p style="color:red">{{ m }}</p>{% endfor %}{% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Загрузить</button>
+  </form>
+
+  <p><a href="/">← На главную</a></p>
+</body>
+</html>

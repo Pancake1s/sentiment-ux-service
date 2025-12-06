@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>Маппинг колонок</title></head>
+<body>
+  <h1>Маппинг колонок ({{ original_name }})</h1>
+  <p>Найдены столбцы: {{ columns|join:", " }}</p>
+
+  <form method="post" action="{% url 'upload_step2_import' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Импортировать</button>
+  </form>
+
+  <p><a href="{% url 'upload_step1' %}">← Вернуться к загрузке</a></p>
+</body>
+</html>
