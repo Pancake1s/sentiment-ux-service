@@ -13,9 +13,14 @@ from reviews.text_preprocess import preprocess_pipeline
 
 from .forms import UploadFileForm, make_column_mapping_form
 from .models import Review
-from .utils import (dataframe_head_columns, parse_date_or_none,
-                    safe_read_textlike_file_to_df, suggest_text_columns,
-                    to_int_or_none, to_str_or_empty)
+from .utils import (
+    dataframe_head_columns,
+    parse_date_or_none,
+    safe_read_textlike_file_to_df,
+    suggest_text_columns,
+    to_int_or_none,
+    to_str_or_empty,
+)
 
 
 def home(request):
