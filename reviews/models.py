@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Review(models.Model):
     SENTIMENT_CHOICES = [
         ("negative", "negative"),
@@ -10,7 +11,9 @@ class Review(models.Model):
 
     review_text = models.TextField()
     processed_text = models.TextField(blank=True)
-    sentiment = models.CharField(max_length=16, choices=SENTIMENT_CHOICES, default="", blank=True)
+    sentiment = models.CharField(
+        max_length=16, choices=SENTIMENT_CHOICES, default="", blank=True
+    )
 
     date = models.DateField(null=True, blank=True)
     region = models.CharField(max_length=128, blank=True)
@@ -31,5 +34,9 @@ class Review(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        parts = [self.date.isoformat() if self.date else "no_date", self.region or "no_region", self.sentiment or "unknown"]
+        parts = [
+            self.date.isoformat() if self.date else "no_date",
+            self.region or "no_region",
+            self.sentiment or "unknown",
+        ]
         return " | ".join(parts)

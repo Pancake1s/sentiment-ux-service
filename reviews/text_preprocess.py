@@ -15,7 +15,7 @@ if not hasattr(inspect, "getargspec"):
         return ArgSpec(
             fs.args,
             fs.varargs,
-            fs.varkw, 
+            fs.varkw,
             fs.defaults,
         )
 
@@ -32,8 +32,19 @@ _RU_STOP = set(stopwords.words("russian"))
 _MORPH = MorphAnalyzer()
 
 _COMMON_TRASH = {
-    "ооо", "зао", "ип", "ooo", "ooo.", "магазин", "сайт", "компания",
-    "интернет", "онлайн", "оплачивать", "курьер", "доставка"
+    "ооо",
+    "зао",
+    "ип",
+    "ooo",
+    "ooo.",
+    "магазин",
+    "сайт",
+    "компания",
+    "интернет",
+    "онлайн",
+    "оплачивать",
+    "курьер",
+    "доставка",
 }
 
 _URL_RE = re.compile(r"https?://\S+|www\.\S+", flags=re.IGNORECASE)
@@ -41,6 +52,7 @@ _TAG_RE = re.compile(r"<[^>]+>")
 # оставляем буквы/цифры/пробел, заменяя остальное на пробел
 _NON_ALNUM_RE = re.compile(r"[^0-9a-zа-яё\s]+", flags=re.IGNORECASE)
 _MULTI_SPACE_RE = re.compile(r"\s+")
+
 
 def basic_cleanup(text: str) -> str:
     """
@@ -53,6 +65,7 @@ def basic_cleanup(text: str) -> str:
     s = _MULTI_SPACE_RE.sub(" ", s).strip()
     return s
 
+
 def tokenize(s: str) -> List[str]:
     """
     Токенизация по пробелам после очистки.
@@ -60,6 +73,7 @@ def tokenize(s: str) -> List[str]:
     if not s:
         return []
     return s.split()
+
 
 def filter_stopwords(tokens: Iterable[str]) -> List[str]:
     """
@@ -76,6 +90,7 @@ def filter_stopwords(tokens: Iterable[str]) -> List[str]:
         out.append(t)
     return out
 
+
 def lemmatize_ru(tokens: Iterable[str]) -> List[str]:
     """
     Лемматизация русских слов через pymorphy2.
@@ -87,6 +102,7 @@ def lemmatize_ru(tokens: Iterable[str]) -> List[str]:
             continue
         out.append(_MORPH.parse(t)[0].normal_form)
     return out
+
 
 def preprocess_pipeline(text: str, do_lemmatize: bool = True) -> str:
     """

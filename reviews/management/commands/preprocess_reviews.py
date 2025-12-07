@@ -1,16 +1,26 @@
 from django.core.management.base import BaseCommand
+
 from reviews.models import Review
 from reviews.text_preprocess import preprocess_pipeline
+
 
 class Command(BaseCommand):
     help = "Предобработка текстов: заполнить processed_text на основе review_text"
 
     def add_arguments(self, parser):
-        parser.add_argument("--batch", type=int, default=1000, help="Размер батча (по умолчанию 1000)")
-        parser.add_argument("--only-empty", action="store_true",
-                            help="Обрабатывать только записи, где processed_text пуст")
-        parser.add_argument("--no-lemma", action="store_true",
-                            help="Не делать лемматизацию (только чистка+стоп-слова)")
+        parser.add_argument(
+            "--batch", type=int, default=1000, help="Размер батча (по умолчанию 1000)"
+        )
+        parser.add_argument(
+            "--only-empty",
+            action="store_true",
+            help="Обрабатывать только записи, где processed_text пуст",
+        )
+        parser.add_argument(
+            "--no-lemma",
+            action="store_true",
+            help="Не делать лемматизацию (только чистка+стоп-слова)",
+        )
 
     def handle(self, *args, **opts):
         batch_size = opts["batch"]
@@ -32,7 +42,9 @@ class Command(BaseCommand):
             r.processed_text = preprocess_pipeline(r.review_text, do_lemmatize=do_lemma)
             buf.append(r)
             if len(buf) >= batch_size:
-                Review.objects.bulk_update(buf, ["processed_text"], batch_size=batch_size)
+                Review.objects.bulk_update(
+                    buf, ["processed_text"], batch_size=batch_size
+                )
                 processed += len(buf)
                 self.stdout.write(f"Обработано: {processed}/{total}")
                 buf.clear()

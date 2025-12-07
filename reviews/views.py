@@ -1,29 +1,26 @@
 import os
 import uuid
-from typing import List, Dict
+from typing import Dict, List
 
 import pandas as pd
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
+
+from reviews.text_preprocess import preprocess_pipeline
 
 from .forms import UploadFileForm, make_column_mapping_form
 from .models import Review
-from .utils import (
-    safe_read_textlike_file_to_df,
-    dataframe_head_columns,
-    suggest_text_columns,
-    to_int_or_none,
-    to_str_or_empty,
-    parse_date_or_none,
-)
-from reviews.text_preprocess import preprocess_pipeline
+from .utils import (dataframe_head_columns, parse_date_or_none,
+                    safe_read_textlike_file_to_df, suggest_text_columns,
+                    to_int_or_none, to_str_or_empty)
 
 
 def home(request):
     return render(request, "home.html")
+
 
 def reviews_list(request):
     qs = Review.objects.all()[:50]
@@ -73,11 +70,15 @@ def upload_step1(request):
                 initial["review_text"] = text_candidates[0]
 
             form_map = ColumnMappingForm(initial=initial)
-            return render(request, "reviews/column_mapping.html", {
-                "form": form_map,
-                "columns": cols,
-                "original_name": original_name,
-            })
+            return render(
+                request,
+                "reviews/column_mapping.html",
+                {
+                    "form": form_map,
+                    "columns": cols,
+                    "original_name": original_name,
+                },
+            )
     else:
         form = UploadFileForm()
     return render(request, "reviews/upload.html", {"form": form})
@@ -131,7 +132,7 @@ def upload_step2_import(request):
                 if not text:
                     skipped += 1
                     continue
-                
+
                 processed = preprocess_pipeline(text)
                 date_val = parse_date_or_none(row.get(date_col)) if date_col else None
                 region_val = to_str_or_empty(row.get(region_col)) if region_col else ""
@@ -140,17 +141,19 @@ def upload_step2_import(request):
                 age_val = to_int_or_none(row.get(age_col)) if age_col else None
                 source_val = to_str_or_empty(row.get(src_col)) if src_col else ""
 
-                to_create.append(Review(
-                    review_text=text,
-                    processed_text=processed,  
-                    sentiment="",       
-                    date=date_val,
-                    region=region_val,
-                    product_category=cat_val,
-                    gender=gender_val,
-                    age=age_val,
-                    source=source_val,
-                ))
+                to_create.append(
+                    Review(
+                        review_text=text,
+                        processed_text=processed,
+                        sentiment="",
+                        date=date_val,
+                        region=region_val,
+                        product_category=cat_val,
+                        gender=gender_val,
+                        age=age_val,
+                        source=source_val,
+                    )
+                )
 
             created = 0
             if to_create:
@@ -162,12 +165,16 @@ def upload_step2_import(request):
             except OSError:
                 pass
 
-            return render(request, "reviews/import_result.html", {
-                "original_name": original_name,
-                "created": created,
-                "skipped": skipped,
-                "total": int(created) + int(skipped),
-            })
+            return render(
+                request,
+                "reviews/import_result.html",
+                {
+                    "original_name": original_name,
+                    "created": created,
+                    "skipped": skipped,
+                    "total": int(created) + int(skipped),
+                },
+            )
 
     # если не POST — вернуть на шаг 1
     messages.error(request, "Неверный метод запроса. Повторите загрузку.")
