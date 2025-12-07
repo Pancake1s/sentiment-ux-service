@@ -19,6 +19,7 @@ from .utils import (
     to_str_or_empty,
     parse_date_or_none,
 )
+from reviews.text_preprocess import preprocess_pipeline
 
 
 def home(request):
@@ -130,7 +131,8 @@ def upload_step2_import(request):
                 if not text:
                     skipped += 1
                     continue
-
+                
+                processed = preprocess_pipeline(text)
                 date_val = parse_date_or_none(row.get(date_col)) if date_col else None
                 region_val = to_str_or_empty(row.get(region_col)) if region_col else ""
                 cat_val = to_str_or_empty(row.get(cat_col)) if cat_col else ""
@@ -140,7 +142,7 @@ def upload_step2_import(request):
 
                 to_create.append(Review(
                     review_text=text,
-                    processed_text="",  
+                    processed_text=processed,  
                     sentiment="",       
                     date=date_val,
                     region=region_val,
